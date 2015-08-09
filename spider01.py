@@ -38,6 +38,6 @@ class Spider:
 
 if __name__ == "__main__":
 	spd = Spider()
-	for i in range(1, 2):
+	for i in range(1, 18):
 		spd.getContent(i)
 	print spd.article_number
