@@ -38,7 +38,7 @@ class Spider:
 				break
 			except Exception, e:
 				time.sleep(5)
-				print e +  " Retry to " + url
+				print str(e) +  " Retry to " + url
 
 		print "Connection Failed to " + url
 		return page
