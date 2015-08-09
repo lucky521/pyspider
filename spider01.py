@@ -4,7 +4,7 @@ __author__ = "Lucky"
 
 import urllib
 import urllib2
-import re 
+import re,time
 import threading
 
 class Collector:
@@ -29,10 +29,20 @@ class Spider:
 	def getPage(self, pageIndex):
 		url = self.siteURL + "" + str(pageIndex)
 		print url
-
+		page = ""
 		request = urllib2.Request(url, headers=self.hdr)
-		response = urllib2.urlopen(request)
-		return response.read()#.decode('gbk')
+		for i in range(1,4):
+			try:
+				response = urllib2.urlopen(request, timeout=8) #timeout
+				page = response.read()
+				break
+			except Exception, e:
+				time.sleep(5)
+				print e +  " Retry to " + url
+
+		print "Connection Failed to " + url
+		return page
+
 
 	def getContent(self, pageIndex):
 		page = self.getPage(pageIndex)
