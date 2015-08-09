@@ -28,20 +28,19 @@ class Spider:
 
 	def getPage(self, pageIndex):
 		url = self.siteURL + "" + str(pageIndex)
-		print url
-		page = ""
 		request = urllib2.Request(url, headers=self.hdr)
 		for i in range(1,4):
 			try:
 				response = urllib2.urlopen(request, timeout=8) #timeout
 				page = response.read()
-				break
+				print url
+				return page
 			except Exception, e:
-				time.sleep(5)
+				time.sleep(8)
 				print str(e) +  " Retry to " + url
 
 		print "Connection Failed to " + url
-		return page
+		return ""
 
 
 	def getContent(self, pageIndex):
@@ -72,7 +71,7 @@ def worker(index):
 
 if __name__ == "__main__":
 	threads = []
-	for i in range(1,5):
+	for i in range(1,18):
 		t = threading.Thread(target=worker, args=(i,))
 		threads.append(t)
 		t.setDaemon(True)   # So thread can be terminated by Ctrl+C
