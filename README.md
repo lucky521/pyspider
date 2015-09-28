@@ -4,7 +4,6 @@ My Python Web Spider
 On the Internet, Spider is one of the most interesting and useful technologies. It help us collect and analyse what we want. We need spider to be faster and smarter. My Python Web Spider now is Simple. But I will make it stronger little by little.
 
 
----
 ## Specify Content
 Regular Expression
 
@@ -35,7 +34,7 @@ Format output
 Muli Threading
 Reconnection
 
----
+
 ###Reference:
 [key board interrupt](http://stackoverflow.com/questions/4136632/ctrl-c-i-e-keyboardinterrupt-to-kill-threads-in-python)
 
