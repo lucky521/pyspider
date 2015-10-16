@@ -15,7 +15,6 @@ class PageLib:
 				return True
 			else:
 				return False	
-
 		def storePage(self, url):
 			self.page_set.add(url)
 			return
@@ -26,16 +25,29 @@ pagelib = PageLib()
 
 class Collector:
 	def __init__(self):
-		self.article_number = 0
-		self.article_name = []
-
+		self.data = set()
 	def add(self, name):
-		self.article_number += 1
-		self.article_name.append(name)
-		return 
+		self.data.add(name)
+		return
+	def isExist(self, name):
+		if name in self.data:
+			return True
+		else:
+			return False
 
 # global
 collector = Collector()
+
+
+class Logger():
+	def __init__(self):
+		self.timeout_times = 0
+
+	def connection_timeout(self):
+		self.timeout_times += 1
+
+# global
+logger = Logger()
 
 
 
@@ -52,20 +64,20 @@ class Spider:
 
 
 	def match_forum_page(self, page):
-		match_set = set()
 		# http://www.qyx888.com/forum-19-1.html
-		regex = self.baseURL + "forum-[0-9][0-9]*-1.html"
+		match_set = set()
+		regex = "forum-[0-9]+-1.html"
 		pattern = re.compile(regex)
 		items = re.findall(pattern, page)
 		for item in items:
-			print "match" + str(item)
+			#print "match " + str(item)
 			match_set.add(item)
 		return match_set
 
 	def match_thread_page(self, page):
 		# http://www.qyx888.com/thread-405018-1-1.html
 		match_set = set()
-		regex = self.baseURL + "thread-[0-9][0-9]*-1.html"
+		regex = "thread-[0-9]+-[0-9]+-1.html"
 		pattern = re.compile(regex)
 		items = re.findall(pattern, page)
 		for item in items:
@@ -75,6 +87,7 @@ class Spider:
 
 
 	def getPage(self, url):
+		url = self.baseURL + url
 		request = urllib2.Request(url, headers=self.hdr)
 		# If fail or timeout, Retry for 3 times
 		for i in range(1,4):
@@ -87,21 +100,9 @@ class Spider:
 				time.sleep(8)
 				print str(e) +  " Retry to " + url
 		print "Connection Failed to " + url
+		logger.connection_timeout()
 		return ""
 
-	def handle_DIY(self, content):
-		result = content
-		'''
-		pattern1 = re.compile("^.*[0-9]*(?=\")")
-		match1 = pattern1.search(content)
-		url = "http://www.zhihu.com"+ match1.group()
-
-		pattern2 = re.compile("(?<=>).*$")
-		match2 = pattern2.search(content)
-		title = match2.group()
-		result = "[%s](%s)\n\n" %(title,url)
-		'''
-		return result
 	
 	def outtofile(self, filename, content):
 		f1 = file(filename, "a")
@@ -118,32 +119,12 @@ class Spider:
 		regex = "[\s\S]*?"
 		pattern = re.compile("(?<=" + lookbehind +")" + regex + "(?=" + lookahead +")")
 		items = re.findall(pattern, page)
+		print "get data: " + str(len(items))
 		for item in items:
 			#print item
-			collector.add(item)
-			diy = self.handle_DIY(item)
-			self.outtofile("collected_data.md", diy.encode('utf-8'))
-		return
-
-
-	def getContent_from_url(self, pageIndex):
-		page = self.getPage(pageIndex)
-		#print page
-		#self.outtofile("tmp.md", page.encode('utf-8'))
-
-		#grep certain content
-		lookbehind = "<div class=\"sign\" style=\"max-height:150px;maxHeightIE:150px;\">"
-#		lookbehind = "<div class=\"sign\" style=\"max-height:150px;maxHeightIE:150px;\"><strong><font size=\"3\">"
-#		lookbehind = "zm-item-title\"><a target=\"_blank\" href=\"" 
-		lookahead = "</div>\r\n</td>\r\n</tr>\r\n<tr id=\"_postposition"
-		regex = "[\s\S]*?"
-		pattern = re.compile("(?<=" + lookbehind +")" + regex + "(?=" + lookahead +")")
-		items = re.findall(pattern, page)
-		for item in items:
-			#print item
-			collector.add(item)
-			diy = self.handle_DIY(item)
-			self.outtofile("collected_data.md", diy.encode('utf-8'))
+			if not collector.isExist(item):
+				collector.add(item)
+				self.outtofile("tmp_collected_data.md", item.encode('utf-8')+ "\r\n\r\n")
 		return
 
 
@@ -158,36 +139,65 @@ class Spider:
 			if not pagelib.inLib(url):
 				new_url_set.add(url)
 
-		print "Find new urls: " + str(new_url_set)
+		print "Find new urls: " + str(len(new_url_set))
 		return new_url_set
 
 
 	def start_work(self):
-		front_page = self.getPage(self.baseURL + "forum.php") # front page
+		front_url = "forum.php" # front page
+		front_page = self.getPage(front_url)   
+		self.getContent_from_page(front_page)
+		pagelib.storePage(front_url)
 		new_url1 = self.get_all_url_in_current_page(front_page)
 		new_url2 = set()
 
-		if len(new_url1) > 0: 
-			time.sleep(1)
-			for url in new_url1:
+		while len(new_url1) > 0:
+			time.sleep(2)
+			tmp_list = list(new_url1)
+			tmp_list.sort(reverse=True)
+			for url in tmp_list:
+				time.sleep(1)
+				if pagelib.inLib(url):
+					continue
 				print "surf to " + str(url)
 				# get page just once
 				page = self.getPage(url)
-				# get new url from page
-				new_url2 = new_url2.union(self.get_all_url_in_current_page(page))
-				# get target data from page
-				self.getContent_from_page(page)
 				# mark this page as old
 				pagelib.storePage(url)
+				# get new url from page
+				new_url2 = new_url2 | self.get_all_url_in_current_page(page)
+				# get target data from page
+				self.getContent_from_page(page)
+
 			new_url1 = new_url2
+			new_url2.clear()
+
+		# list all the url
+		print "\n\npage num: " + str(len(pagelib.page_set))
+		for url in pagelib.page_set:
+			self.outtofile("tmp_pagelib.md", url)
 
 		return
 
 
 #######################################################
+# utilities
+
+def backupfile(sfile, dfile):
+	file1 = file(sfile)
+	file2 = file(dfile, 'w')
+	for it in file1:
+		file2.write(it)
+	file1.close()
+	file2.close()
+	open(sfile,'w').close()
+	return
+
+
+#######################################################
+# main and worker thread
 def worker(index):
 	spd = Spider()
-	#spd.getContent(index)
 	spd.start_work()
 	return
 
@@ -201,7 +211,10 @@ if __name__ == "__main__":
 		t.start() 
 
 	for t in threads:
-		t.join(600)
+		t.join()
 
-	print collector.article_number
+	backupfile("tmp_collected_data.md", "result_data.md")
+	backupfile("tmp_pagelib.md", "result_urls.md")
 
+	print "Taks Done. Data number:" + str(len(collector.data))
+	print "timeout times: " + str(logger.timeout_times)
