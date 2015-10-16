@@ -6,7 +6,9 @@ import re,time
 import threading
 from copy import deepcopy
 ##############################################
-#template
+# template class for global & common resource
+
+# record urls
 class PageLib:
 		def __init__(self):
 			self.page_set = set()
@@ -23,7 +25,7 @@ class PageLib:
 # global 
 pagelib = PageLib()
 
-
+# collect target data
 class Collector:
 	def __init__(self):
 		self.data = set()
@@ -50,7 +52,7 @@ class Logger():
 # global
 logger = Logger()
 
-
+##############################################
 
 class Spider:
 	def __init__(self):
@@ -63,7 +65,7 @@ class Spider:
 				'Connection': 'keep-alive'}
 		return
 
-
+	#TODO: this can be utility
 	def match_forum_page(self, page):
 		# http://www.qyx888.com/forum-19-1.html
 		match_set = set()
@@ -75,6 +77,7 @@ class Spider:
 			match_set.add(item)
 		return match_set
 
+	#TODO: this can be utility
 	def match_thread_page(self, page):
 		# http://www.qyx888.com/thread-405018-1-1.html
 		match_set = set()
@@ -88,6 +91,7 @@ class Spider:
 
 
 	def getPage(self, url):
+		# return page data from url, do nothing else
 		url = self.baseURL + url
 		request = urllib2.Request(url, headers=self.hdr)
 		# If fail or timeout, Retry for 3 times
@@ -104,7 +108,7 @@ class Spider:
 		logger.connection_timeout()
 		return ""
 
-	
+
 	def outtofile(self, filename, content):
 		f1 = file(filename, "a")
 		f1.write(content + '\n')
@@ -131,7 +135,7 @@ class Spider:
 
 	def get_all_url_in_current_page(self, page):
 		new_url_set = set()
-		#match url and store new urls
+		# match url and just store new urls
 		for url in self.match_thread_page(page):
 			if not pagelib.inLib(url):
 				new_url_set.add(url)
@@ -198,7 +202,10 @@ def backupfile(sfile, dfile):
 
 
 #######################################################
-# main and worker thread
+# -- main and worker thread
+# target webside may be not fast to access
+# and I do not let them notice me
+# so I do not use multi-thread now
 def worker(index):
 	spd = Spider()
 	spd.start_work()
@@ -207,7 +214,7 @@ def worker(index):
 
 if __name__ == "__main__":
 	threads = []
-	for i in range(1,2):
+	for i in range(1,2): # thread num
 		t = threading.Thread(target=worker, args=(i,))
 		threads.append(t)
 		t.setDaemon(True)   # So thread can be terminated by Ctrl+C
