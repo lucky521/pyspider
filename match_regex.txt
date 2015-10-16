@@ -1,0 +1,13 @@
+<a href.*?>
+</a>
+<strong>
+</strong>
+<font.*?>
+</font>
+&nbsp;
+&gt;
+&lt;
+&quot;
+<br />
+<img.*?>
+http://.*?.html
