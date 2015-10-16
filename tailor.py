@@ -6,8 +6,8 @@ import re,time
 import threading
 from copy import deepcopy
 ##############################################
-input_filename = "tmp_tailor.md"
-output_filename = "result_" + input_filename
+input_filename = "orginal_data.md"
+output_filename = "tailed_" + input_filename
 ##############################################
 # get match regex
 match_list = []
@@ -23,7 +23,8 @@ dfile = file(output_filename, 'w')
 file_string = sfile.read()
 tailed_string = ""
 for item in match_list:	
-	# print re.sub("[ ,.]", ":", string)
+	if len(item) == 0:
+		pass
 	tailed_string = re.sub(item, "", file_string)
 	file_string = tailed_string
 dfile.write(tailed_string)
