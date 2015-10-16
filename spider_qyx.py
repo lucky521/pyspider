@@ -4,6 +4,7 @@ import urllib
 import urllib2
 import re,time
 import threading
+from copy import deepcopy
 ##############################################
 #template
 class PageLib:
@@ -144,11 +145,11 @@ class Spider:
 
 
 	def start_work(self):
-		front_url = "forum.php" # front page
+		front_url = "thread-414645-17-1.html" # front page
 		front_page = self.getPage(front_url)   
 		self.getContent_from_page(front_page)
 		pagelib.storePage(front_url)
-		new_url1 = self.get_all_url_in_current_page(front_page)
+		new_url1 = deepcopy(self.get_all_url_in_current_page(front_page))
 		new_url2 = set()
 
 		while len(new_url1) > 0:
@@ -165,12 +166,14 @@ class Spider:
 				# mark this page as old
 				pagelib.storePage(url)
 				# get new url from page
-				new_url2 = new_url2 | self.get_all_url_in_current_page(page)
+				new_url2 = deepcopy(new_url2 | self.get_all_url_in_current_page(page))
 				# get target data from page
 				self.getContent_from_page(page)
 
-			new_url1 = new_url2
+			new_url1.clear()
+			new_url1 = deepcopy(new_url2) # deep copy
 			new_url2.clear()
+			print "***************************urls left to access: " + str(len(new_url1))
 
 		# list all the url
 		print "\n\npage num: " + str(len(pagelib.page_set))
