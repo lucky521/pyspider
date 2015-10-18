@@ -1,4 +1,4 @@
-## PySpider
+d## PySpider
 My Python Web Spider
 
 On the Internet, Spider is one of the most interesting and useful technologies. It help us collect and analyse what we want. We need spider to be faster and smarter. My Python Web Spider now is Simple. But I will make it stronger little by little.
@@ -7,6 +7,8 @@ On the Internet, Spider is one of the most interesting and useful technologies. 
 ## Specify Content
 Regular Expression
 
+	match URL
+	match target data
 
 
 ## Http Request Constructor

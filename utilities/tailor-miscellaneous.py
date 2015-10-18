@@ -1,5 +1,8 @@
 __author__ = "Lucky"
 ## -*- coding:utf-8 -*-
+'''
+Remove Miscellaneous content
+'''
 import urllib
 import urllib2
 import re,time
@@ -7,7 +10,7 @@ import threading
 from copy import deepcopy
 ##############################################
 input_filename = "orginal_data.md"
-output_filename = "tailed_" + input_filename
+output_filename = "tailed_pure_" + input_filename
 ##############################################
 # get match regex
 match_list = []
