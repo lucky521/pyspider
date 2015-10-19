@@ -9,7 +9,7 @@ import re,time
 import threading
 from copy import deepcopy
 ##############################################
-input_filename = "orginal_data.md"
+input_filename = "original_data.md"
 output_filename = "tailed_pure_" + input_filename
 ##############################################
 # get match regex
