@@ -56,7 +56,7 @@ logger = Logger()
 
 class Spider:
 	def __init__(self):
-		self.baseURL = 'http://www.qyx888.com/'
+		self.baseURL = 'http://www.xxx.com/'
 		self.hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11', 
 				'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 				'Accept-Charset': 'ISO-8859-1,gbk;q=0.7,*;q=0.3', 
@@ -67,7 +67,7 @@ class Spider:
 
 	#TODO: this can be utility
 	def match_forum_page(self, page):
-		# http://www.qyx888.com/forum-19-1.html
+		# http://www.xxx.com/forum-19-1.html
 		match_set = set()
 		regex = "forum-[0-9]+-1.html"
 		pattern = re.compile(regex)
@@ -79,7 +79,7 @@ class Spider:
 
 	#TODO: this can be utility
 	def match_thread_page(self, page):
-		# http://www.qyx888.com/thread-405018-1-1.html
+		# http://www.xxx.com/thread-405018-1-1.html
 		match_set = set()
 		regex = "thread-[0-9]+-[0-9]+-1.html"
 		pattern = re.compile(regex)
